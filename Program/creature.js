@@ -26,7 +26,6 @@ function createSVGPanel() {
     }
 
     deleteAllChildren(svgPanel);
-
     svgPanel.setAttribute('width', width);
     svgPanel.setAttribute('height', height);
 }
