@@ -3,11 +3,28 @@
 */
 
 'use strict';
-
+/**
+ * Функция для открытия файла
+ *
+ * @author Leonova
+ * @version 1.0.1
+ */
 const openFile = (evt) => {
+    /**
+     * Переменная для целевого файла
+     *
+     * @var const f
+     */
     const f = evt.target.files[0];
 
     const reader = new FileReader();
+
+    /**
+     * Функция вывода файла в панель рисования.
+     * Отрисовывает фигуры
+     *
+     * @param string $e
+     */
     reader.onload = function(e) {
         document.getElementById('svg-panel').outerHTML = e.target.result;
         svgPanel = document.getElementById('svg-panel');

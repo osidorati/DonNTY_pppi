@@ -1,4 +1,4 @@
-/* Созддание нового пространства рисования, файла */
+/* Создание нового пространства рисования, файла */
 
 function deleteChild( node, parent ) {
     for (var i = 0; i < node.childNodes.length;)
@@ -10,11 +10,23 @@ function deleteChild( node, parent ) {
     }
 }
 
+/**
+ * Функция очищения пространства для рисования
+ *
+ * @author Leonova
+ * @version 1.0.1
+ */
 function deleteAllChildren( node ) {
     for (var i = 0; i < node.childNodes.length;)
         deleteChild(node.childNodes[i], node);
 }
 
+/**
+ * Функция создания нового пространства для рисования
+ *
+ * @author Leonova
+ * @version 1.0.1
+ */
 function createSVGPanel() {
     var
         width = prompt('Введите ширину нового поля', 900),
