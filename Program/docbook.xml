@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book>
+  <bookinfo>
+    <title>Graphic</title>
+
+    <author>
+      <firstname>Oksana</firstname>
+
+      <surname>Leonova</surname>
+
+      <affiliation>
+        <orgname>loksana864@gmail.com</orgname>
+      </affiliation>
+    </author>
+
+    <pubdate>06-03-2023</pubdate>
+  </bookinfo>
+
+  <chapter>
+    <title>Документация к векторному редактору</title>
+
+    <section>
+      <title>Общее описание</title>
+
+      <para><emphasis>Векторный редактор для секторной графики</emphasis></para>
+
+      <para>Векторный редактор, с реализацией не менее 20-ти программных средств доступных в CorelDraw Graphics Suite не ниже 2021 версии.</para>
+    </section>
+  </chapter>
+
+  <chapter>
+    <title>Работа с файлами</title>
+
+    <section>
+      <title>Открытие файла</title>
+
+      <mediaobject>
+            <textobject>
+          <phrase>Вариант использования №1 – открытие файла</phrase>
+        </textobject>
+      </mediaobject>
+
+       <programlisting>'use strict';
+/**
+ * Функция для открытия файла
+ *
+ * @author Leonova
+ * @version 1.0.1
+ */
+const openFile = (evt) => {
+    /**
+     * Переменная для целевого файла
+     *
+     * @var const f
+     */
+    const f = evt.target.files[0];
+
+    const reader = new FileReader();
+
+    /**
+     * Функция вывода файла в панель рисования.
+     * Отрисовывает фигуры
+     *
+     * @param string $e
+     */
+    reader.onload = function(e) {
+        document.getElementById('svg-panel').outerHTML = e.target.result;
+        svgPanel = document.getElementById('svg-panel');
+
+        const rects = svgPanel.getElementsByTagName('rect');
+        const circles = svgPanel.getElementsByTagName('circle');
+        for (let i = 0; i &lt; rects.length; i++) {
+            if (rects[i].getAttribute('stroke-opacity') === '0.5') {
+                svgPanel.removeChild(rects[i]);
+            }
+        }
+        while (circles.length > 0) {
+            svgPanel.removeChild(circles[0]);
+        }
+
+        const childs = Array.prototype.slice.call(svgPanel.childNodes);
+        for (let i = 1; i &lt; childs.length; i++) {
+            switch(childs[i].nodeName) {
+                case 'rect':
+                    Rectangle.create(childs[i]);
+                    break;
+                case 'ellipse':
+                    Ellipse.create(childs[i]);
+                    break;
+                case 'polygon':
+                    Polyline.create(childs[i]);
+                    break;
+                case 'path':
+                    BrushBox.create(childs[i]);
+                    break;
+                case 'foreignObject':
+                    TextBox.create(childs[i]);
+                    break;
+                case 'line':
+                    Line.create(childs[i]);
+                    break;
+            }
+        }
+    };
+    reader.readAsText(f);
+};
+
+document.getElementById('file-input').addEventListener('change', openFile);
+
+</programlisting>
+
+      <para>Сохранение файла</para>
+
+      <para>Поддерживает сохранение файла в формате .svg </para>
+
+      <mediaobject>
+             <textobject>
+          <phrase>Вариант использования №2 – сохранение файла</phrase>
+        </textobject>
+      </mediaobject>
+
+      <programlisting>
+/* Сохранение файла в нужное пространство */
+
+
+/**
+ * Функция сохранения файла в нужное пространство
+ *
+ * @return url
+ */
+function saveSVG() {
+    /**
+     * Главная панель
+     *
+     * @var string svgData
+     */
+    var svgData = drawPanel.innerHTML.toString();
+
+    /**
+     * Имя файла
+     *
+     * @var string fileName
+     */
+    var fileName = prompt('Введите, пожалуйста, имя файла без расширения:');
+
+    if (fileName == null)
+        return;
+
+    /**
+     * Элемент файла
+     *
+     * @var string a
+     */
+        var a = document.createElement("a");
+    document.body.appendChild(a);
+    a.style = "display: none";
+
+    var blob = new Blob([svgData], {type: "octet/stream"}),
+        url = window.URL.createObjectURL(blob);
+    a.href = url;
+    a.download = fileName + ".svg";
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+	</programlisting>
+    </section>
+
+    <section>
+      <title>Создание области для рисования</title>
+
+        <mediaobject>
+         <textobject>
+          <phrase>Вариант использования №3 – рисование фигур</phrase>
+        </textobject>
+      </mediaobject>
+
+      <programlisting>/* Создание нового пространства рисования, файла */
+
+function deleteChild( node, parent ) {
+    for (var i = 0; i &lt; node.childNodes.length;)
+        deleteChild(node.childNodes[i], node);
+
+    if (node.childNodes.length == 0) {
+        parent.removeChild(node);
+        return;
+    }
+}
+
+/**
+ * Функция очищения пространства для рисования
+ *
+ * @author Leonova
+ * @version 1.0.1
+ */
+function deleteAllChildren( node ) {
+    for (var i = 0; i &lt; node.childNodes.length;)
+        deleteChild(node.childNodes[i], node);
+}
+
+/**
+ * Функция создания нового пространства для рисования
+ *
+ * @author Leonova
+ * @version 1.0.1
+ */
+function createSVGPanel() {
+    var
+        width = prompt('Введите ширину нового поля', 900),
+        height = prompt('Введите высоту нового поля', 500);
+
+    if (width &lt; 1 || height &lt; 1){
+        alert("Пожалуйста, введите корректные данные!")
+        return;
+    }
+
+    deleteAllChildren(svgPanel);
+    svgPanel.setAttribute('width', width);
+    svgPanel.setAttribute('height', height);
+}</programlisting>
+
+    </section>
+  </chapter>
+</book>
